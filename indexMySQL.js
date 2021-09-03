@@ -29,31 +29,43 @@ app.get(apiversion + '/books',  function (req, res)  {
   
 });
 
-//Get student by id
-app.get(apiversion + '/student/:studentId',  function (req, res)  {  
+//Get book by id
+app.get(apiversion + '/book/:bookid',  function (req, res)  {  
 
 
   res.setHeader('Content-Type', 'application/json');
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-  var studentId = Number(req.params.studentId);
+  var bookid = Number(req.params.bookid);
   
-  db.query('SELECT * FROM student where studentId=?', studentId.toString(),function (error, results, fields) {
+  db.query('SELECT * FROM books where bookid=?', bookid.toString(),function (error, results, fields) {
       if (error) throw error;
-      return res.send({ error: false, message: 'student Id =' + studentId.toString(), data: results });
+      return res.send({ error: false, message: 'book id =' + bookid.toString(), data: results });
   });
 
 
 });
 
 
-
-
-
-
 //Delete book by id
-app.delete(apiversion + '/book/:bookid',  function (req, res)  {  
+app.get(apiversion + '/student/:studentId',  function (req, res)  { 
+  res.setHeader('Content-Type', 'application/json');
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  
+  var studentId = req.params.studentId;
+
+  db.query('SELECT * FROM student where studentId=?', studentId.toString(),function (error, results, fields) {
+    if (error) throw error;
+    return res.send({ error: false, message: 'student Id =' + studentId.toString(), data: results });
+
+
+  
+  
+  });
+
+  
 
   //Code for Delete
 
@@ -80,33 +92,22 @@ app.post(apiversion + '/book',  function (req, res)  {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-  var bookid = Number(req.params.bookid);
   
   db.query(`INSERT INTO books 
     (title,price, isbn, pageCount, publishedDate, thumbnailUrl, 
     shortDescription, author, category) 
-    VALUES ( '${title1}',${price1}, '${isbn1}', ${pageCount1}, '${publishedDate1}', '${thumbnailUrl1}', 
-    '${shortDescription1}', '${author1}', '${category1}');`,function (error, results, fields) {
+    VALUES ( '${title}',${price}, '${isbn}', ${pageCount}, '${publishedDate}', '${thumbnailUrl}', 
+    '${shortDescription}', '${author}', '${category}');`,function (error, results, fields) {
       if (error) throw error;
       return res.send({ error: false, message: 'Insert new book' });
   });
 
 
 });
-//test
+
 
 
 //Edit book by id
-app.put(apiversion + '/book/:bookid',  function (req, res)  {  
-
-
-  //Code for Edit
-
-
-});
-
-
-//Add new student
 app.post(apiversion + '/student',  function (req, res) {
 
   var studentId = req.body.studentId
@@ -119,18 +120,121 @@ app.post(apiversion + '/student',  function (req, res) {
   db.query(`INSERT INTO student (studentId,studentName) VALUES ('${studentId}','${studentName}');`,function (error, results, fields) {
     if (error) throw error;
     return res.send({ error: false, message: 'Insert new student' });
-  });
+  }); 
 
 
 });
+
+
+
+//Edit book by id
+app.put(apiversion + '/book/:bookid',  function (req, res) {
+
+  var title = req.body.title; 	
+  var price=req.body.price;
+	var isbn = req.body.isbn;
+	var pageCount = req.body.pageCount;
+	var publishedDate=req.body.publishedDate;
+	var thumbnailUrl=req.body.thumbnailUrl;
+  var shortDescription=req.body.shortDescription;
+  var author=req.body.author;
+  var category=req.body.category;
+
+  var bookid = req.params.bookid;
+
+
+  res.setHeader('Content-Type', 'application/json');
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+  
+  db.query(`UPDATE books
+            SET
+                title = '${title}',
+                price = ${price},
+                isbn = '${isbn}',
+                pageCount = ${pageCount},
+                publishedDate = '${publishedDate}',
+                thumbnailUrl = '${thumbnailUrl}',
+                shortDescription = '${shortDescription}',
+                author = '${author}',
+                category = '${category}'
+              WHERE bookid = ${bookid};`,function (error, results, fields) {
+      if (error) throw error;
+      return res.send({ error: false, message: ' Modified book' });
+  });
+
+});
+
+
+
+//Edit book by id
+app.post(apiversion + '/student',  function (req, res) {
+
+  var studentId = req.body.studentId
+  var studentName = req.body.studentName
+
+  res.setHeader('Content-Type', 'application/json');
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+  db.query(`INSERT INTO student (studentId,studentName) VALUES ('${studentId}','${studentName}');`,function (error, results, fields) {
+    if (error) throw error;
+    return res.send({ error: false, message: 'Insert new student' });
+  }); 
+
+
+});
+
+
+
+//Edit book by id
+app.delete(apiversion + '/book/:bookid',  function (req, res) {
+
+
+  var bookid = req.params.bookid;
+
+
+  res.setHeader('Content-Type', 'application/json');
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+  
+  db.query(`DELETE from books WHERE bookid = ${bookid};`,function (error, results, fields) {
+      if (error) throw error;
+      return res.send({ error: false, message: ' Modified book' });
+  });
+
+  
+
   
   
+
+
+
+
+
+
+
+
+
+  //Code for Edit
+
+
+
+
+
+
+
+
+
+
+
+
+});
 
 
 
 app.listen(port, function () {
     console.log("Server is up and running...");
-  
-  });
-
-
+});
